@@ -3287,6 +3287,9 @@ bool CAI_Navigator::CanFitAtNode(int nodeNum, unsigned int collisionMask )
 
 	CAI_Node* pTestNode = GetNetwork()->GetNode(nodeNum);
 	Vector startPos		= pTestNode->GetPosition(GetHullType());
+	
+	if ( !V_strncmp(gpGlobals->mapname.ToCStr(),"mapgen",6) )
+				return true;
 
 	// -------------------------------------------------------------------
 	// Check ground nodes for standable bottom

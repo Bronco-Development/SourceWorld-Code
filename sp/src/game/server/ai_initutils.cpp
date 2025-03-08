@@ -347,6 +347,50 @@ int CNodeEnt::Spawn( const char *pMapData )
 	return -1;
 }
 
+CON_COMMAND_F(ai_create_info_node, "This allows you to create a new info_node at a specific position or at the curent players view", FCVAR_NONE)
+{
+    CBasePlayer* pPlayer = UTIL_GetLocalPlayer();
+    if (!pPlayer)
+        return;
+    Vector vForward;
+    pPlayer->GetVectors(&vForward, NULL, NULL);
+    trace_t tr;
+    QAngle angle(0, 0, 0);
+
+    Vector pos;
+
+    if (args.ArgC() == 4)
+    {
+        pos.x = atof(args[1]);
+        pos.y = atof(args[2]);
+        pos.z = atof(args[3]);
+    }
+    else
+    {
+        UTIL_TraceLine(pPlayer->EyePosition(), pPlayer->EyePosition() + vForward * MAX_TRACE_LENGTH, MASK_SHOT, pPlayer, COLLISION_GROUP_NPC, &tr);
+
+        DebugDrawLine(pPlayer->EyePosition(), tr.endpos, 0, 255, 0, false, 10.0f);
+
+        pos = tr.endpos;
+    }
+
+    CNodeEnt::m_nNodeCount++;
+
+    CAI_Node* new_node = g_pBigAINet->AddNode(pos, angle.y);
+
+    new_node->SetType(NODE_GROUND);
+
+    g_pAINetworkManager->GetEditOps()->SetRebuildFlags();
+    new_node->m_eNodeInfo |= bits_NODE_WC_CHANGED;
+
+    g_AINetworkBuilder.InitNodePosition(g_pBigAINet, new_node);
+}
+
+CON_COMMAND_F(ai_rebuld_graph, "Rebulds nodegraph.", FCVAR_NONE)
+{
+	g_pAINetworkManager->RebuildNetworkGraph();
+}
+
 //-----------------------------------------------------------------------------
 // Purpose:
 // Input  :

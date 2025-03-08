@@ -36,6 +36,11 @@ extern const char *g_MapName;
 // The game's name found in gameinfo.txt. Mostly used for Discord RPC.
 extern char g_iszGameName[128];
 
+// From mapbase_shared.cpp
+extern char g_DiscordState[128];
+extern char g_DiscordDetails[128];
+extern char g_DiscordLargeImageText[128];
+
 #ifdef MAPBASE_RPC
 void MapbaseRPC_CVarToggle( IConVar *var, const char *pOldString, float flOldValue );
 
@@ -248,9 +253,14 @@ END_DATADESC()
 
 // Changing the default value of the convars below will not work.
 // Use "scripts/mapbase_rpc.txt" instead.
+static ConVar cl_discord_override("cl_discord_override", "0", FCVAR_NONE);
+// static ConVar cl_discord_state("cl_discord_state", "SourceWorld", FCVAR_NONE);
+// static ConVar cl_discord_details("cl_discord_details", "In-game", FCVAR_NONE);
+// static ConVar cl_discord_smallimage("cl_discord_smallimage", "mb_logo_episodic", FCVAR_NONE);
+// static ConVar cl_discord_smallimage_text("cl_discord_smallimage_text", "SourceWorld", FCVAR_NONE);
 static ConVar cl_discord_appid("cl_discord_appid", "582595088719413250", FCVAR_NONE);
-static ConVar cl_discord_largeimage("cl_discord_largeimage", "mb_logo_episodic", FCVAR_NONE);
-static ConVar cl_discord_largeimage_text("cl_discord_largeimage_text", "Half-Life 2", FCVAR_NONE);
+static ConVar cl_discord_largeimage("cl_discord_largeimage", "neat_icon", FCVAR_NONE);
+// static ConVar cl_discord_largeimage_text("cl_discord_largeimage_text", "Half-Life 2", FCVAR_NONE);
 static int64_t startTimestamp = time(0);
 
 //
@@ -323,9 +333,6 @@ void MapbaseRPC_Init()
 
 		const char *szLargeImage = pKV->GetString("discord_largeimage", cl_discord_largeimage.GetString());
 		cl_discord_largeimage.SetValue(szLargeImage);
-
-		const char *szLargeImageText = pKV->GetString("discord_largeimage_text", cl_discord_largeimage_text.GetString());
-		cl_discord_largeimage_text.SetValue( szLargeImageText );
 	}
 	pKV->deleteThis();
 
@@ -565,12 +572,14 @@ void MapbaseRPC_GetDiscordParameters( DiscordRichPresence &discordPresence, int 
 	if (details[0] != '\0')
 		discordPresence.details = details;
 
-	// Generic Mapbase logo. Specific to the Mapbase Discord application.
-	discordPresence.smallImageKey = "mb_logo_general";
-	discordPresence.smallImageText = "Mapbase";
+	if (strcmp(cl_discord_override.GetString(), "1") == 0)
+	{
+		discordPresence.state = g_DiscordState;
+		discordPresence.details = g_DiscordDetails;
+	}
 
 	discordPresence.largeImageKey = cl_discord_largeimage.GetString();
-	discordPresence.largeImageText = cl_discord_largeimage_text.GetString();
+	discordPresence.largeImageText = g_DiscordLargeImageText;
 }
 
 void MapbaseRPC_UpdateDiscord( int iType, const char *pMapName )
@@ -601,6 +610,18 @@ void MapbaseRPC_CVarToggle( IConVar *var, const char *pOldString, float flOldVal
 		MapbaseRPC_Shutdown();
 	}
 }
+void Mapbase_discord_update_f(void)
+{
+	if (mapbase_rpc_enabled.GetInt() > 0)
+	{
+		MapbaseRPC_Update(g_MapName != NULL ? RPCSTATE_UPDATE : RPCSTATE_INIT, g_MapName);
+	}
+	else if (mapbase_rpc_enabled.GetInt() <= 0)
+	{
+		DevMsg("Couldn't update, because RPC is turned off\n");
+	}
+}
+ConCommand mapbase_discord_update("mapbase_discord_update", Mapbase_discord_update_f, "Updates RPC without shutting in down.", 0);
 #endif
 
 #endif

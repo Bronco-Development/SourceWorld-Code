@@ -50,7 +50,7 @@ ConVar mapbase_load_default_manifest("mapbase_load_default_manifest", "1", FCVAR
 
 #ifdef GAME_DLL
 // This constant should change with each Mapbase update
-ConVar mapbase_version( "mapbase_version", MAPBASE_VERSION, FCVAR_NONE, "The version of Mapbase currently being used in this mod's server.dll" );
+ConVar mapbase_version( "mapbase_version", MAPBASE_VERSION, FCVAR_NONE, "The version of Mapbase currently being used in SourceWorld's server.dll" );
 
 ConVar mapbase_flush_talker("mapbase_flush_talker", "1", FCVAR_NONE, "Normally, when a map with custom talker files is unloaded, the response system resets to rid itself of the custom file(s). Turn this convar off to prevent that from happening.");
 
@@ -81,6 +81,11 @@ static bool g_bMapbaseCore;
 
 // The game's name found in gameinfo.txt. Mostly used for Discord RPC.
 char g_iszGameName[128];
+char g_DiscordState[128];
+char g_DiscordDetails[128];
+char g_DiscordLargeImageText[128];
+
+
 
 #ifdef GAME_DLL
 // Default player configuration
@@ -607,6 +612,11 @@ public:
 	void LoadCustomClientSchemeFile( const char *szScript )		{ LoadFromValue( szScript, MANIFEST_CLIENTSCHEME, false ); }
 	void LoadCustomHUDAnimationsFile( const char *szScript )	{ LoadFromValue( szScript, MANIFEST_HUDANIMATIONS, false ); }
 	void LoadCustomHUDLayoutFile( const char *szScript )		{ LoadFromValue( szScript, MANIFEST_HUDLAYOUT, false ); }
+	
+	void SetDiscordState( const char *szScript )			{ Q_strncpy(g_DiscordState, szScript, sizeof(g_DiscordState) ); }
+	void SetDiscordDetails( const char *szScript )			{ Q_strncpy(g_DiscordDetails, szScript, sizeof(g_DiscordDetails) ); }
+	void SetDiscordLargeImageText( const char *szScript )			{ Q_strncpy(g_DiscordLargeImageText, szScript, sizeof(g_DiscordLargeImageText) ); }
+	
 #else
 	void LoadCustomTalkerFile( const char *szScript )			{ LoadFromValue( szScript, MANIFEST_TALKER, false ); }
 	void LoadCustomActbusyFile( const char *szScript )			{ LoadFromValue( szScript, MANIFEST_ACTBUSY, false ); }
@@ -622,6 +632,8 @@ public:
 	{
 		g_pScriptVM->RegisterInstance( this, "Mapbase" );
 	}
+
+	
 #endif
 
 private:
@@ -655,6 +667,10 @@ BEGIN_SCRIPTDESC_ROOT( CMapbaseSystem, SCRIPT_SINGLETON "All-purpose Mapbase sys
 	DEFINE_SCRIPTFUNC( LoadCustomClientSchemeFile, "Loads a custom ClientScheme.res override file." )
 	DEFINE_SCRIPTFUNC( LoadCustomHUDAnimationsFile, "Loads a custom HUD animations override file." )
 	DEFINE_SCRIPTFUNC( LoadCustomHUDLayoutFile, "Loads a custom HUD layout override file." )
+	
+	DEFINE_SCRIPTFUNC( SetDiscordState, "Sets custom Discord state." )
+	DEFINE_SCRIPTFUNC( SetDiscordDetails, "Sets custom Discord details." )
+	DEFINE_SCRIPTFUNC( SetDiscordLargeImageText, "Sets custom Discord large image text." )
 #else
 	DEFINE_SCRIPTFUNC( LoadCustomTalkerFile, "Loads a custom talker file." )
 	DEFINE_SCRIPTFUNC( LoadCustomActbusyFile, "Loads a custom actbusy file." )

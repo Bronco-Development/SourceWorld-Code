@@ -169,6 +169,7 @@ void CAI_NetworkManager::RebuildNetworkGraph( void )
 	}
 }
 
+
 //-----------------------------------------------------------------------------
 // Purpose:  Used for WC edit move to rebuild the network around the given
 //			 location.  Rebuilding the entire network takes too long
@@ -1490,6 +1491,7 @@ void CAI_NetworkEditTools::RecalcUsableNodesForHull(void)
 	m_pTestHull->SetHullType((Hull_t)m_iHullDrawNum);
 	m_pTestHull->SetHullSizeNormal();
 
+
 	for (int node=0;node<m_pNetwork->NumNodes();node++) 
 	{
 		if ( ( m_pNetwork->GetNode(node)->m_eNodeInfo & ( HullToBit( (Hull_t)m_iHullDrawNum ) << NODE_ENT_FLAGS_SHIFT ) )  ||
@@ -1499,7 +1501,8 @@ void CAI_NetworkEditTools::RecalcUsableNodesForHull(void)
 		}
 		else
 		{
-			m_pNetwork->GetNode(node)->m_eNodeInfo |= bits_NODE_WONT_FIT_HULL;
+			if ( V_strncmp(gpGlobals->mapname.ToCStr(),"mapgen",6) ) 
+				m_pNetwork->GetNode(node)->m_eNodeInfo |= bits_NODE_WONT_FIT_HULL;
 		}
 	}
 	CAI_TestHull::ReturnTestHull();
@@ -2628,7 +2631,7 @@ void CAI_NetworkBuilder::InitNodePosition(CAI_Network *pNetwork, CAI_Node *pNode
 	{
 		InitGroundNodePosition( pNetwork, pNode );
 
-		if (pNode->m_flVOffset[HULL_SMALL_CENTERED] < -100)
+		if (pNode->m_flVOffset[HULL_SMALL_CENTERED] < -3000)
 		{
 			Assert( pNetwork == g_pBigAINet );
 			DevWarning("ERROR: Node %.0f %.0f %.0f, WC ID# %i, is either too low (fell through floor) or too high (>100 units above floor)\n",
@@ -3027,6 +3030,8 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 	// FIRST CHECK IF HULL CAN EVEN FIT AT THESE NODES
 	// ==============================================================
 	// @Note (toml 02-10-03): this should be optimized, caching the results of CanFitAtNode() 
+	
+	/*
 	if ( !( pSrcNode->m_eNodeInfo & ( HullToBit( hull ) << NODE_ENT_FLAGS_SHIFT ) ) &&
 		 !m_pTestHull->GetNavigator()->CanFitAtNode(srcId,MASK_NPCWORLDSTATIC) )
 	{
@@ -3040,6 +3045,7 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 		DebugConnectMsg( srcId, destId, "      Cannot fit at node %d\n", destId );
 		return 0;
 	}
+	*/
 	
 	// ==============================================================
 	// AIR NODES (FLYING)
@@ -3130,6 +3136,7 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 		Vector srcPos	 = pSrcNode->GetPosition(hull);
 		Vector destPos	 = pDestNode->GetPosition(hull);
 
+		/*
 		if (!m_pTestHull->GetMoveProbe()->CheckStandPosition( srcPos, MASK_NPCWORLDSTATIC))
 		{
 			DebugConnectMsg( srcId, destId, "      Failed to stand at %d\n", srcId );
@@ -3141,16 +3148,41 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 			DebugConnectMsg( srcId, destId, "      Failed to stand at %d\n", destId );
 			fStandFailed = true;
 		}
-
+		*/
+		
 		//if (hull == 0)
 		//	DevMsg("from %.1f %.1f %.1f to %.1f %.1f %.1f\n", srcPos.x, srcPos.y, srcPos.z, destPos.x, destPos.y, destPos.z );
 
 		if ( !fStandFailed )
-		{
-			fWalkFailed = !m_pTestHull->GetMoveProbe()->TestGroundMove( srcPos, destPos, MASK_NPCWORLDSTATIC, AITGM_IGNORE_INITIAL_STAND_POS, NULL );
-			if ( fWalkFailed )
-				DebugConnectMsg( srcId, destId, "      Failed to walk between nodes\n" );
-		}
+        {
+            fWalkFailed = !m_pTestHull->GetMoveProbe()->TestGroundMove(srcPos, destPos, MASK_NPCWORLDSTATIC, AITGM_IGNORE_INITIAL_STAND_POS, NULL);
+
+            trace_t tr;
+            UTIL_TraceLine(srcPos, destPos, MASK_SOLID, NULL, &tr);
+			
+			trace_t Itr;
+            UTIL_TraceLine(destPos, srcPos, MASK_SOLID, NULL, &Itr);
+			
+			if ( !V_strncmp(gpGlobals->mapname.ToCStr(),"mapgen",6) )
+				fWalkFailed = false;
+			
+            if (tr.fraction < 1.0)
+            {
+                if (tr.m_pEnt && tr.m_pEnt->ClassMatches("prop_dynamic"))
+                {
+                    fWalkFailed = true;
+					DebugConnectMsg( srcId, destId, "      Prop_dynamic between nodes\n" );
+                }
+				if (Itr.m_pEnt && Itr.m_pEnt->ClassMatches("prop_dynamic"))
+                {
+                    fWalkFailed = true;
+					DebugConnectMsg( srcId, destId, "      Prop_dynamic between nodes\n" );
+                }
+            }
+			
+            if ( fWalkFailed )
+                DebugConnectMsg( srcId, destId, "      Failed to walk between nodes\n" );
+        }
 
 		// Add to our list of accepable hulls
 		if (!fWalkFailed && !fStandFailed)
