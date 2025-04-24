@@ -152,7 +152,7 @@ ISurface.GetTextureID <- function( name )
 
 // Forward compatibility
 IVGui.GetRootPanel <- function() { return 0x8888 }
-//IVGui.GetGameUIRootPanel <- function() { return 0x8888+1 }
+IVGui.GetGameUIRootPanel <- function() { return 0x8888+1 }
 IVGui.GetClientDLLRootPanel <- function() { return 0x8888+2 }
 IVGui.GetHudViewport <- function() { return 0x8888+10 }
 
@@ -169,6 +169,7 @@ function IVGui::CreatePanel( type, parent, name )
 		switch ( root )
 		{
 			case 0:
+			case 1:
 			case 2:
 			case 10:
 				break;

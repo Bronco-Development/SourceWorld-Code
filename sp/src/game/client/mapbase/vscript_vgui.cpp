@@ -103,7 +103,7 @@
 
 #define ALLOW_CLIENTDLL_ROOT_PARENT 1
 
-#define ALLOW_GAMEUI_ROOT_PARENT 0
+#define ALLOW_GAMEUI_ROOT_PARENT 1
 
 // On level transitions Restore is called up to 4 times in a row (due to .hl? client state files), each time
 // trying to restore script panels from pre and post transitions, failing every time because script panels are

@@ -163,7 +163,8 @@ void CAI_NetworkManager::RebuildNetworkGraph( void )
 {
 	if (m_pfnThink != (void (CBaseEntity::*)())&CAI_NetworkManager::RebuildThink)
 	{
-		UTIL_CenterPrintAll( "Doing partial rebuild of Node Graph...\n" );
+		//UTIL_CenterPrintAll( "Doing partial rebuild of Node Graph...\n" );
+		// This was annoying
 		SetThink(&CAI_NetworkManager::RebuildThink);
 		SetNextThink( gpGlobals->curtime + 0.1f );
 	}
