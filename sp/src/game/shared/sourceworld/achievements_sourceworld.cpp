@@ -111,7 +111,7 @@ protected:
 	}
 
 };
-DECLARE_SW_ACHIEVEMENT(CAchievement100thrun, SW_1ST_RUN, false);
+DECLARE_SW_ACHIEVEMENT(CAchievement100thrun, SW_100TH_RUN, false);
 
 #endif // SOURCEWORLD
 #endif // GAME_DLL
