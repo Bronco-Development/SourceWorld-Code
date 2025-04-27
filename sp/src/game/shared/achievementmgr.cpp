@@ -454,7 +454,7 @@ void CAchievementMgr::Update( float frametime )
 	}
 #endif
 
-#ifndef _DEBUG
+#if !defined(_DEBUG) && !defined(SOURCEWORLD)
 	// keep track if cheats have ever been turned on during this level
 	if ( !WereCheatsEverOn() )
 	{
