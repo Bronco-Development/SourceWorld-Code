@@ -52,6 +52,11 @@ public:
 #endif
 
 	void OnMapEvent( const char *pchEventName );
+
+#ifdef SOURCEWORLD
+	void OnStatsEvent(const char* pchStatName);
+#endif // SOURCEWORLD
+
 	
 	// Interfaces exported to other dlls for achievement list queries
 	IAchievement* GetAchievementByIndex( int index );
@@ -128,6 +133,9 @@ private:
 	CUtlVector<CBaseAchievement *> m_vecKillEventListeners;				// vector of achievements that are listening for kill events
 	CUtlVector<CBaseAchievement *> m_vecMapEventListeners;				// vector of achievements that are listening for map events
 	CUtlVector<CBaseAchievement *> m_vecComponentListeners;				// vector of achievements that are listening for components that make up an achievement
+#ifdef SOURCEWORLD
+	CUtlVector<CBaseAchievement *> m_vecStatEventListeners;				// vector of achivements that are listening for stat events
+#endif // SOURCEWORLD
 	CUtlMap<int, CAchievement_AchievedCount *> m_mapMetaAchievement;				// map of CAchievement_AchievedCount
 
 	struct achievementthink_t

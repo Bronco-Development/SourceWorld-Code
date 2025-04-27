@@ -724,6 +724,17 @@ void CGameRules::MarkAchievement( IRecipientFilter& filter, char const *pchAchie
 	pAchievementMgr->OnMapEvent( pchAchievementName );
 }
 
+#ifdef SOURCEWORLD
+void CGameRules::MarkStatAchievements(IRecipientFilter& filter, char const* pchAchievementStatName)
+{
+	IAchievementMgr* pAchievementMgr = engine->GetAchievementMgr();
+	if (!pAchievementMgr)
+		return;
+	pAchievementMgr->OnStatsEvent(pchAchievementStatName);
+}
+#endif // SOURCEWORLD
+
+
 #endif //} !CLIENT_DLL
 
 

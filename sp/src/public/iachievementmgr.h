@@ -41,6 +41,9 @@ public:
 	virtual void InitializeAchievements() = 0;
 	virtual void AwardAchievement( int iAchievementID ) = 0;
 	virtual void OnMapEvent( const char *pchEventName ) = 0;
+#ifdef SOURCEWORLD
+	virtual void OnStatsEvent(const char* pchStatName) = 0;
+#endif // SOURCEWORLD
 	virtual void DownloadUserData() = 0;
 	virtual void EnsureGlobalStateLoaded() = 0;
 	virtual void SaveGlobalStateIfDirty( bool bAsync ) = 0;
@@ -59,6 +62,11 @@ public:
 #define ACH_FILTER_ATTACKER_IS_PLAYER		0x0100
 #define ACH_FILTER_VICTIM_IS_PLAYER_ENEMY	0x0200
 #define ACH_FILTER_FULL_ROUND_ONLY			0x0400
+
+#ifdef SOURCEWORLD
+#define ACH_LISTEN_STAT_EVENTS				0x1000
+#endif // SOURCEWORLD
+
 
 #define ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS		ACH_LISTEN_KILL_EVENTS | ACH_FILTER_ATTACKER_IS_PLAYER | ACH_FILTER_VICTIM_IS_PLAYER_ENEMY
 #define ACH_LISTEN_KILL_ENEMY_EVENTS		ACH_LISTEN_KILL_EVENTS | ACH_FILTER_VICTIM_IS_PLAYER_ENEMY

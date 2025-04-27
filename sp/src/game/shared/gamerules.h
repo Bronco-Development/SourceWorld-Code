@@ -409,6 +409,10 @@ public:
 	// Game Achievements (server version)
 	virtual void MarkAchievement ( IRecipientFilter& filter, char const *pchAchievementName );
 
+#ifdef SOURCEWORLD
+	virtual void MarkStatAchievements(IRecipientFilter& filter, char const* pchAchievementStatName);
+#endif // SOURCEWORLD
+
 	virtual void ResetMapCycleTimeStamp( void ){ return; }
 
 	virtual void OnNavMeshLoad( void ) { return; }

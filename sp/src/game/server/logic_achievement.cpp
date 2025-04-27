@@ -7,6 +7,10 @@
 #include "entityinput.h"
 #include "entityoutput.h"
 
+#ifdef MAPBASE_VSCRIPT
+#include "vscript_server.h"
+#endif
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -73,6 +77,11 @@
 	ACHIEVEMENT_EVENT_PORTAL_BEAT_GAME
 */
 
+//this is the stats we need to define in the fgd
+/*
+	//SOURCEWORLD
+	SW_RUN_COUNT
+*/
 
 // Allows map logic to send achievement related events to the achievement system.
 class CLogicAchievement : public CLogicalEntity
@@ -86,12 +95,14 @@ protected:
 
 	// Inputs
 	void InputFireEvent( inputdata_t &inputdata );
+	void InputFireStatsEvent(inputdata_t& inputdata);
 	void InputEnable( inputdata_t &inputdata );
 	void InputDisable( inputdata_t &inputdata );
 	void InputToggle( inputdata_t &inputdata );
 	
 	bool			m_bDisabled;
 	string_t		m_iszAchievementEventID;				// Which achievement event this entity marks
+	string_t		m_iszStatEventID;						// Which Stat event this entity marks
 
 	COutputEvent	m_OnFired;
 
@@ -106,9 +117,11 @@ BEGIN_DATADESC( CLogicAchievement )
 
 	DEFINE_KEYFIELD( m_bDisabled, FIELD_BOOLEAN, "StartDisabled" ),
 	DEFINE_KEYFIELD( m_iszAchievementEventID, FIELD_STRING, "AchievementEvent" ),
+	DEFINE_KEYFIELD( m_iszStatEventID, FIELD_STRING, "StatEvent" ),
 
 	// Inputs
 	DEFINE_INPUTFUNC( FIELD_VOID, "FireEvent", InputFireEvent ),
+	DEFINE_INPUTFUNC( FIELD_VOID, "FireStatsEvent", InputFireStatsEvent),
 	DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
@@ -119,13 +132,13 @@ BEGIN_DATADESC( CLogicAchievement )
 END_DATADESC()
 
 
-
 //-----------------------------------------------------------------------------
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
 CLogicAchievement::CLogicAchievement(void)
 {
 	m_iszAchievementEventID		= NULL_STRING;
+	m_iszStatEventID			= NULL_STRING;
 }
 
 #define ACHIEVEMENT_PREFIX	"ACHIEVEMENT_EVENT_"
@@ -155,6 +168,22 @@ void CLogicAchievement::InputFireEvent( inputdata_t &inputdata )
 		}
 	}
 }
+
+#ifdef SOURCEWORLD
+void CLogicAchievement::InputFireStatsEvent(inputdata_t& inputdata)
+{
+	// If we're active, and our string matched a valid stats ID
+	if (!m_bDisabled && m_iszStatEventID != NULL_STRING)
+	{
+		m_OnFired.FireOutput(inputdata.pActivator, this);
+
+		char const* pchName = STRING(m_iszStatEventID);
+		CBroadcastRecipientFilter filter;
+		g_pGameRules->MarkStatAchievements(filter, pchName);
+	}
+}
+#endif // SOURCEWORLD
+
 
 //------------------------------------------------------------------------------
 // Purpose: Turns on the relay, allowing it to fire outputs.

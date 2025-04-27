@@ -415,6 +415,10 @@ void CAchievementMgr::Shutdown()
 	m_vecMapEventListeners.RemoveAll();
 	m_vecComponentListeners.RemoveAll();
 	m_AchievementsAwarded.RemoveAll();
+#ifdef SOURCEWORLD
+	m_vecStatEventListeners.RemoveAll();
+#endif // SOURCEWORLD
+
 	m_bGlobalStateLoaded = false;
 }
 
@@ -506,6 +510,11 @@ void CAchievementMgr::LevelInitPreEntity()
 	m_vecMapEventListeners.RemoveAll();
 	m_vecComponentListeners.RemoveAll();
 
+#ifdef SOURCEWORLD
+	m_vecStatEventListeners.RemoveAll();
+#endif // SOURCEWORLD
+
+
 	m_AchievementsAwarded.RemoveAll();
 
 	m_flLastClassChangeTime = 0;
@@ -555,6 +564,12 @@ void CAchievementMgr::LevelInitPreEntity()
 		{
 			m_vecComponentListeners.AddToTail( pAchievement );
 		}
+		// if we have multiple achivements with the same stat, add it as a listener
+		if (pAchievement->GetFlags() & ACH_LISTEN_STAT_EVENTS)
+		{
+			m_vecStatEventListeners.AddToTail( pAchievement );
+		}
+
 		if ( pAchievement->IsActive() )
 		{
 			pAchievement->ListenForEvents();
@@ -1658,6 +1673,42 @@ void CAchievementMgr::OnMapEvent( const char *pchEventName )
 		Msg( "CAchievementMgr::OnMapEvent: Achievement \"%s\" not found\n", pchEventName );
 	}
 #endif
+}
+
+void CAchievementMgr::OnStatsEvent(const char* pchStatName)
+{
+	FOR_EACH_VEC(m_vecStatEventListeners, iAchievement)
+	{
+		CBaseAchievement* pAchievement = m_vecStatEventListeners[iAchievement];
+		pAchievement->OnStatsEvent(pchStatName);
+	}
+
+#ifndef NO_STEAM
+	// if this achievement's progress should be stored in Steam, set the steam stat for it
+	if (steamapicontext->SteamUserStats())
+	{
+		int32 stat_count = 0;
+		// Set the Steam stat with the same name as the achievement.  Only cached locally until we upload it.
+		char pszProgressName[1024];
+		Q_snprintf(pszProgressName, 1024, "%s_STAT", pchStatName);
+
+		bool m_statCount = steamapicontext->SteamUserStats()->GetStat(pszProgressName, &stat_count); 
+		if (!m_statCount)
+		{
+			DevMsg("Couldn't get the stat count for %s\n", pszProgressName);
+			return;
+		}
+
+		stat_count += 1;
+
+		bool bRet = steamapicontext->SteamUserStats()->SetStat(pszProgressName, stat_count);
+		if (!bRet)
+		{
+			DevMsg("ISteamUserStats::GetStat failed to set progress value in Steam for stat %s\n", pszProgressName);
+		}
+	}
+#endif
+
 }
 
 //-----------------------------------------------------------------------------

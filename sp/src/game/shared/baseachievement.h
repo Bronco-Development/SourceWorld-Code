@@ -85,6 +85,9 @@ public:
 	void EnsureComponentBitSetAndEvaluate( int iBitNumber );
 	void EvaluateIsAlreadyAchieved();
 	virtual void OnMapEvent( const char *pEventName );
+#ifdef SOURCEWORLD
+	virtual void OnStatsEvent(const char* pStatName);
+#endif // SOURCEWORLD
 	virtual void PrintAdditionalStatus() {}		// for debugging, achievements may report additional status in achievement_status concmd
 	virtual void OnSteamUserStatsStored() {}
 	virtual void UpdateAchievement( int nData ) {}
@@ -118,6 +121,9 @@ protected:
 	void SetMapNameFilter( const char *pMapName );
 	void SetComponentPrefix( const char *pPrefix );
 	void IncrementCount( int iOptIncrement = 0 );
+#ifdef SOURCEWORLD
+	void IncrementStatsCount(int iOptIncrement = 0, const char* SteamStatAPIName = NULL);
+#endif // SOURCEWORLD
 	void EvaluateNewAchievement();
 	void AwardAchievement();
 	void ShowProgressNotification();

@@ -263,6 +263,48 @@ void CBaseAchievement::IncrementCount( int iOptIncrement )
 	}
 }
 
+void CBaseAchievement::IncrementStatsCount(int iOptIncrement, const char* SteamStatAPIName)
+{
+		// on client, where the count is kept, increment count
+		if (iOptIncrement > 0)
+		{
+			// user specified that we want to increase by more than one.
+			m_iCount += iOptIncrement;
+			if (m_iCount > m_iGoal)
+			{
+				m_iCount = m_iGoal;
+			}
+		}
+		else if(m_iCount < m_iGoal)
+		{
+			m_iCount++;
+		}
+
+		// if this achievement gets saved w/global state, flag our global state as dirty
+		if (GetFlags() & ACH_SAVE_GLOBAL)
+		{
+			m_pAchievementMgr->SetDirty(true);
+		}
+
+		if (cc_achievement_debug.GetInt())
+		{
+			Msg("Achievement stat count increased for %s: %d/%d\n", GetName(), m_iCount, m_iGoal);
+		}
+
+		// if we've hit goal, award the achievement
+		if (m_iGoal > 0)
+		{
+			if (m_iCount >= m_iGoal)
+			{
+				AwardAchievement();
+			}
+			else
+			{
+				HandleProgressUpdate();
+			}
+		}
+}
+
 void CBaseAchievement::SetShowOnHUD( bool bShow )
 {
  	if ( m_bShowOnHUD != bShow )
@@ -371,6 +413,16 @@ void CBaseAchievement::OnMapEvent( const char *pEventName )
 	if ( 0 == Q_stricmp( pEventName, GetName() ) )
 	{
 		IncrementCount();
+	}
+}
+
+void CBaseAchievement::OnStatsEvent(const char* pStatName)
+{
+	Assert(m_iFlags & ACH_LISTEN_STAT_EVENTS);
+
+	if (!Q_strcmp(pStatName, GetStat()))
+	{	
+		IncrementStatsCount();
 	}
 }
 
