@@ -64,6 +64,7 @@ public:
 #define ACH_FILTER_FULL_ROUND_ONLY			0x0400
 
 #ifdef SOURCEWORLD
+//flag used to track achivements that rely on the same stat for its progression
 #define ACH_LISTEN_STAT_EVENTS				0x1000
 #endif // SOURCEWORLD
 
