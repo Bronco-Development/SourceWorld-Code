@@ -5416,6 +5416,32 @@ public:
 		return ret;
 	}
 
+	bool GetSteamAchievement(const char* szAchAPIName)
+	{	
+		bool isAchieved = false;
+		bool bRet = steamapicontext->SteamUserStats()->GetAchievement(szAchAPIName, &isAchieved);
+		if (bRet)
+		{
+			if (isAchieved)
+			{
+				return isAchieved;
+			}
+		}
+		return isAchieved;
+	}
+
+	int32 GetSteamStat(const char* szStatAPIName)
+	{
+		int32 data;
+		bool bRet = steamapicontext->SteamUserStats()->GetStat(szStatAPIName, &data);
+		if (bRet)
+		{
+			return data;
+		}
+		return 0;
+	}
+
+
 	int GetSecondsSinceComputerActive()
 	{
 		if ( !steamapicontext || !steamapicontext->SteamUtils() )
@@ -5499,6 +5525,8 @@ BEGIN_SCRIPTDESC_ROOT_NAMED( CScriptSteamAPI, "CSteamAPI", SCRIPT_SINGLETON "" )
 	DEFINE_SCRIPTFUNC( GetCurrentBetaName, "Gets the name of the user's current beta branch. In Source SDK Base 2013 Singleplayer, this will usually return 'upcoming'." )
 	//DEFINE_SCRIPTFUNC( IsSubscribedApp, "Returns true if the user is subscribed to the specified app ID." )
 	DEFINE_SCRIPTFUNC( IsAppInstalled, "Returns true if the user has the specified app ID installed on their computer." )
+	DEFINE_SCRIPTFUNC( GetSteamAchievement, "Returns true if the achievement has been unclocked" )
+	DEFINE_SCRIPTFUNC( GetSteamStat,"Returns the stat number as int for the stat you want to recive" )
 END_SCRIPTDESC();
 #endif // !NO_STEAM
 

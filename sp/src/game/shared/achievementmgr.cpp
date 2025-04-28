@@ -416,6 +416,11 @@ void CAchievementMgr::Shutdown()
 	m_vecComponentListeners.RemoveAll();
 	m_AchievementsAwarded.RemoveAll();
 #ifdef SOURCEWORLD
+	FOR_EACH_VEC(m_vecAchievement, iter)
+	{
+		delete m_vecAchievement[iter];
+	}
+
 	m_vecStatEventListeners.RemoveAll();
 #endif // SOURCEWORLD
 
