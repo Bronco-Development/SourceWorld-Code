@@ -5416,6 +5416,8 @@ public:
 		return ret;
 	}
 
+#ifdef SOURCEWORLD
+
 	bool GetSteamAchievement(const char* szAchAPIName)
 	{	
 		bool isAchieved = false;
@@ -5441,6 +5443,18 @@ public:
 		return 0;
 	}
 
+	//simple function to set Steam's Enhanced Rich Presnece
+	//For Doucmentation visit https://partner.steamgames.com/doc/features/enhancedrichpresence
+	//-Nbc66
+	bool SetSteamRichPresence(const char* key, const char* value)
+	{
+		if (!steamapicontext || !steamapicontext->SteamFriends())
+			return 0;
+
+		return steamapicontext->SteamFriends()->SetRichPresence(key, value);
+	};
+
+#endif //SOURCEWORLD
 
 	int GetSecondsSinceComputerActive()
 	{
@@ -5525,8 +5539,11 @@ BEGIN_SCRIPTDESC_ROOT_NAMED( CScriptSteamAPI, "CSteamAPI", SCRIPT_SINGLETON "" )
 	DEFINE_SCRIPTFUNC( GetCurrentBetaName, "Gets the name of the user's current beta branch. In Source SDK Base 2013 Singleplayer, this will usually return 'upcoming'." )
 	//DEFINE_SCRIPTFUNC( IsSubscribedApp, "Returns true if the user is subscribed to the specified app ID." )
 	DEFINE_SCRIPTFUNC( IsAppInstalled, "Returns true if the user has the specified app ID installed on their computer." )
+#ifdef SOURCEWORLD
 	DEFINE_SCRIPTFUNC( GetSteamAchievement, "Returns true if the achievement has been unclocked" )
 	DEFINE_SCRIPTFUNC( GetSteamStat,"Returns the stat number as int for the stat you want to recive" )
+	DEFINE_SCRIPTFUNC( SetSteamRichPresence, "simple function to set Steam's Enhanced Rich Presnece For Doucmentation visit:\nhttps://partner.steamgames.com/doc/features/enhancedrichpresence")
+#endif // SOURCEWORLD
 END_SCRIPTDESC();
 #endif // !NO_STEAM
 

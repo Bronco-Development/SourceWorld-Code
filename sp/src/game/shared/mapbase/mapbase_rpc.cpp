@@ -457,8 +457,10 @@ void MapbaseRPC_UpdateSteam( int iType, const char *pMapName )
 
 	if (pszStatus)
 	{
+#ifndef SOURCEWORLD // we set this using vscript in sourceworld -Nbc66
 		steamapicontext->SteamFriends()->SetRichPresence( "gamestatus", pszStatus );
 		steamapicontext->SteamFriends()->SetRichPresence( "steam_display", "#SteamRPC_Status" );
+#endif // !SOURCEWORLD
 
 		if (gpGlobals->maxClients > 1)
 		{
@@ -472,8 +474,10 @@ void MapbaseRPC_UpdateSteam( int iType, const char *pMapName )
 				char szGroupSize[8];
 				Q_snprintf(szGroupSize, sizeof(szGroupSize), "%i", MapbaseRPC_GetPlayerCount());
 
+#ifndef SOURCEWORLD // we set this using vscript in sourceworld -Nbc66
 				steamapicontext->SteamFriends()->SetRichPresence( "steam_player_group", szGroupID );
 				steamapicontext->SteamFriends()->SetRichPresence( "steam_player_group_size", szGroupSize );
+#endif // !SOURCEWORLD
 			}
 			else
 			{
