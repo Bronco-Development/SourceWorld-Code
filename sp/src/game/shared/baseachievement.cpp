@@ -416,6 +416,7 @@ void CBaseAchievement::OnMapEvent( const char *pEventName )
 	}
 }
 
+#ifdef SOURCEWORLD
 void CBaseAchievement::OnStatsEvent(const char* pStatName)
 {
 	Assert(m_iFlags & ACH_LISTEN_STAT_EVENTS);
@@ -425,6 +426,7 @@ void CBaseAchievement::OnStatsEvent(const char* pStatName)
 		IncrementStatsCount();
 	}
 }
+#endif // SOURCEWORLD
 
 //-----------------------------------------------------------------------------
 // Purpose: called when an achievement is awarded
