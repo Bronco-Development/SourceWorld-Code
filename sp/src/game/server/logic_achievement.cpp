@@ -95,7 +95,9 @@ protected:
 
 	// Inputs
 	void InputFireEvent( inputdata_t &inputdata );
+#ifdef SOURCEWORLD
 	void InputFireStatsEvent(inputdata_t& inputdata);
+#endif // SOURCEWORLD
 	void InputEnable( inputdata_t &inputdata );
 	void InputDisable( inputdata_t &inputdata );
 	void InputToggle( inputdata_t &inputdata );
@@ -121,7 +123,9 @@ BEGIN_DATADESC( CLogicAchievement )
 
 	// Inputs
 	DEFINE_INPUTFUNC( FIELD_VOID, "FireEvent", InputFireEvent ),
+#ifdef SOURCERWORLD
 	DEFINE_INPUTFUNC( FIELD_VOID, "FireStatsEvent", InputFireStatsEvent),
+#endif // SOURCERWORLD
 	DEFINE_INPUTFUNC( FIELD_VOID, "Enable", InputEnable ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "Disable", InputDisable ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "Toggle", InputToggle ),
