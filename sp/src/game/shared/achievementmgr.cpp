@@ -1712,7 +1712,7 @@ void CAchievementMgr::OnStatsEvent(const char* pchStatName)
 		bool bRet = steamapicontext->SteamUserStats()->SetStat(pszProgressName, stat_count);
 		if (!bRet)
 		{
-			DevMsg("ISteamUserStats::GetStat failed to set progress value in Steam for stat %s\n", pszProgressName);
+			DevMsg("ISteamUserStats::SetStat failed to set progress value in Steam for stat %s\n", pszProgressName);
 		}
 	}
 #endif

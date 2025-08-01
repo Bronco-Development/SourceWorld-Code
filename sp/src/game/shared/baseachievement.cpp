@@ -263,6 +263,7 @@ void CBaseAchievement::IncrementCount( int iOptIncrement )
 	}
 }
 
+#ifdef SOURCEWORLD
 void CBaseAchievement::IncrementStatsCount(int iOptIncrement, const char* SteamStatAPIName)
 {
 		// on client, where the count is kept, increment count
@@ -304,6 +305,7 @@ void CBaseAchievement::IncrementStatsCount(int iOptIncrement, const char* SteamS
 			}
 		}
 }
+#endif// SOURCEWORLD
 
 void CBaseAchievement::SetShowOnHUD( bool bShow )
 {
