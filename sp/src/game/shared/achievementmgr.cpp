@@ -569,11 +569,13 @@ void CAchievementMgr::LevelInitPreEntity()
 		{
 			m_vecComponentListeners.AddToTail( pAchievement );
 		}
+#ifdef SOURCEWORLD
 		// if we have multiple achivements with the same stat, add it as a listener
 		if (pAchievement->GetFlags() & ACH_LISTEN_STAT_EVENTS)
 		{
 			m_vecStatEventListeners.AddToTail( pAchievement );
 		}
+#endif // SOURCEWORLD
 
 		if ( pAchievement->IsActive() )
 		{
@@ -1680,6 +1682,7 @@ void CAchievementMgr::OnMapEvent( const char *pchEventName )
 #endif
 }
 
+#ifdef SOURCEWORLD
 void CAchievementMgr::OnStatsEvent(const char* pchStatName)
 {
 	FOR_EACH_VEC(m_vecStatEventListeners, iAchievement)
@@ -1709,12 +1712,13 @@ void CAchievementMgr::OnStatsEvent(const char* pchStatName)
 		bool bRet = steamapicontext->SteamUserStats()->SetStat(pszProgressName, stat_count);
 		if (!bRet)
 		{
-			DevMsg("ISteamUserStats::GetStat failed to set progress value in Steam for stat %s\n", pszProgressName);
+			DevMsg("ISteamUserStats::SetStat failed to set progress value in Steam for stat %s\n", pszProgressName);
 		}
 	}
 #endif
 
 }
+#endif // SOURCEWORLD
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns an achievement as it's abstract object. This interface is used by gameui.dll for getting achievement info.

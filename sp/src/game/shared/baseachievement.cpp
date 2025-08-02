@@ -263,6 +263,7 @@ void CBaseAchievement::IncrementCount( int iOptIncrement )
 	}
 }
 
+#ifdef SOURCEWORLD
 void CBaseAchievement::IncrementStatsCount(int iOptIncrement, const char* SteamStatAPIName)
 {
 		// on client, where the count is kept, increment count
@@ -304,6 +305,7 @@ void CBaseAchievement::IncrementStatsCount(int iOptIncrement, const char* SteamS
 			}
 		}
 }
+#endif// SOURCEWORLD
 
 void CBaseAchievement::SetShowOnHUD( bool bShow )
 {
@@ -416,6 +418,7 @@ void CBaseAchievement::OnMapEvent( const char *pEventName )
 	}
 }
 
+#ifdef SOURCEWORLD
 void CBaseAchievement::OnStatsEvent(const char* pStatName)
 {
 	Assert(m_iFlags & ACH_LISTEN_STAT_EVENTS);
@@ -425,6 +428,7 @@ void CBaseAchievement::OnStatsEvent(const char* pStatName)
 		IncrementStatsCount();
 	}
 }
+#endif // SOURCEWORLD
 
 //-----------------------------------------------------------------------------
 // Purpose: called when an achievement is awarded
